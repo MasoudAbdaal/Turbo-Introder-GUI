@@ -1,0 +1,64 @@
+Turbo Intruder
+Copyright 2018-2026 PortSwigger Ltd and contributors
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License, version 3, as published by
+the Free Software Foundation. See LICENSE for the full text.
+
+
+Prior licensing history
+-----------------------
+
+Turbo Intruder was originally released under the Apache License, Version 2.0.
+Every version published up to and including release 1.62 was distributed under
+those terms. Those grants are irrevocable and remain in effect for the versions
+in which they were made: anyone who received Turbo Intruder under the Apache
+License, Version 2.0 retains all rights it conferred, in perpetuity.
+
+The change to the GNU Affero General Public License, version 3, applies to
+subsequent versions only.
+
+A copy of the Apache License, Version 2.0 is retained in LICENSE-APACHE-2.0,
+as required for the portions of this codebase described below.
+
+
+Apache-licensed portions
+------------------------
+
+Parts of this codebase originate in contributions submitted under the Apache
+License, Version 2.0. Those contributions remain licensed under that license by
+their authors. They are incorporated into this AGPLv3-licensed work as permitted
+by the Apache License, which is compatible with version 3 of the GNU General
+Public License and its Affero variant.
+
+Copyright in those contributions is retained by their respective holders,
+including:
+
+  András Veres-Szentkirályi
+  Amey Anekar
+  BApp Support (PortSwigger)
+  Evan Custodio
+  Gareth Heyes
+  Hannah Law
+  James Kettle
+  Martin
+  Mojito Noproblem
+  Peter Tillema
+  PortSwigger Support
+  Paul Johnston
+  Wyatt Dahlenburg
+  mosesrenegade
+  sw33tLie
+  yujunqiang
+  zeropercentangel
+
+No relicensing of these contributions is claimed or implied. Redistributors of
+this work must retain this NOTICE and the attributions above.
+
+
+Third-party components
+----------------------
+
+Binary distributions of Turbo Intruder (the fat jar) bundle third-party
+libraries that are licensed separately by their respective authors. Those
+licenses are unaffected by the license of this work.

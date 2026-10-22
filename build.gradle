@@ -1,0 +1,104 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+sourceCompatibility = 21
+targetCompatibility = 21
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.10"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+def preparedUpstreamSources = layout.buildDirectory.dir('generated/upstream-src')
+
+tasks.register('prepareUpstreamSources', Sync) {
+    from 'turbo-intruder/src'
+    into preparedUpstreamSources
+    exclude 'BurpExtender.kt'
+}
+
+sourceSets {
+    main {
+        kotlin {
+            srcDir preparedUpstreamSources
+            srcDir 'GUI/src'
+            srcDir 'GUI/integration'
+        }
+        java {
+            srcDir preparedUpstreamSources
+        }
+        resources {
+            srcDir 'turbo-intruder/resources'
+            srcDir 'turbo-intruder/docs'
+        }
+    }
+    test {
+        kotlin {
+            srcDir 'turbo-intruder/test/kotlin'
+            srcDir 'GUI/test'
+        }
+    }
+}
+
+tasks.named('compileKotlin') {
+    dependsOn tasks.named('prepareUpstreamSources')
+}
+
+tasks.named('compileJava') {
+    dependsOn tasks.named('prepareUpstreamSources')
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1.10"
+
+    implementation 'org.python:jython-standalone:2.7.0'
+    implementation 'com.fifesoft:rsyntaxtextarea:3.1.1'
+    implementation 'com.fifesoft:rstaui:3.1.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+    implementation files('turbo-intruder/hpack-1.0.2.jar')
+    implementation files('turbo-intruder/albinowaxUtils-all.jar')
+    implementation 'tech.kwik:kwik:0.10.3'
+
+    implementation 'io.modelcontextprotocol.sdk:mcp:0.17.0'
+    implementation 'org.eclipse.jetty.ee10:jetty-ee10-servlet:12.1.9'
+    implementation 'org.eclipse.jetty:jetty-server:12.1.9'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    workingDir file('turbo-intruder')
+    exclude '**/McpIntegrationTest.class'
+    useJUnitPlatform {
+        // Upstream's JythonIntegrationTest targets a live public host. Keep the
+        // reproducible default build offline and leave external validation opt-in.
+        excludeTags 'integration'
+    }
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    archiveFileName = 'turbo-intruder-gui.jar'
+    destinationDirectory = file('GUI/dist')
+    manifest {
+        attributes('Main-Class': 'burp.Fast_httpKt')
+    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.EC'
+}
+
+build.dependsOn jar
