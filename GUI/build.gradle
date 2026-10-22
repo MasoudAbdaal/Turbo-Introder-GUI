@@ -29,8 +29,8 @@ sourceSets {
     main {
         kotlin {
             srcDir preparedUpstreamSources
-            srcDir 'GUI/src'
-            srcDir 'GUI/integration'
+            srcDir 'src'
+            srcDir 'integration'
         }
         java {
             srcDir preparedUpstreamSources
@@ -43,7 +43,7 @@ sourceSets {
     test {
         kotlin {
             srcDir 'turbo-intruder/test/kotlin'
-            srcDir 'GUI/test'
+            srcDir 'test'
         }
     }
 }
@@ -90,10 +90,14 @@ processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
 jar {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     archiveFileName = 'turbo-intruder-gui.jar'
-    destinationDirectory = file('GUI/dist')
     manifest {
         attributes('Main-Class': 'burp.Fast_httpKt')
     }
@@ -101,4 +105,31 @@ jar {
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.EC'
 }
 
-build.dependsOn jar
+def distributionJar = file('../turbo-intruder-gui.jar')
+
+tasks.register('publishDistribution') {
+    dependsOn tasks.named('check')
+    dependsOn tasks.named('jar')
+    inputs.file tasks.named('jar').flatMap { it.archiveFile }
+    outputs.file distributionJar
+    doLast {
+        def source = tasks.named('jar').get().archiveFile.get().asFile.toPath()
+        def target = distributionJar.toPath()
+        def temporary = target.resolveSibling(target.fileName.toString() + '.tmp')
+        java.nio.file.Files.copy(source, temporary, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+        try {
+            java.nio.file.Files.move(
+                temporary,
+                target,
+                java.nio.file.StandardCopyOption.ATOMIC_MOVE,
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+            )
+        } catch (java.nio.file.AtomicMoveNotSupportedException ignored) {
+            java.nio.file.Files.move(temporary, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+        }
+    }
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('publishDistribution')
+}

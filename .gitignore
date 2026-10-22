@@ -2,8 +2,9 @@
 .kotlin/
 build/
 
-GUI/dist/*
-!GUI/dist/.gitkeep
+*.jar
+!/turbo-intruder-gui.jar
+!GUI/gradle/wrapper/gradle-wrapper.jar
 
 .idea/
 .vscode/

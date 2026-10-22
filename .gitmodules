@@ -1,3 +1,3 @@
 [submodule "turbo-intruder"]
-	path = turbo-intruder
+	path = GUI/turbo-intruder
 	url = https://github.com/PortSwigger/turbo-intruder.git
